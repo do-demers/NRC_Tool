@@ -3,6 +3,8 @@ var intext_en = "";
 var intext_fr = "";
 var maxLength = 750;
 
+//TEST COMMENT FOR COMMIT
+
 //Get elements
 var selectBTN = d3.select("#submitBTN");
 var clearBTN = d3.select("#clearBTN");
