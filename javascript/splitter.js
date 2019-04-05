@@ -1,25 +1,25 @@
 //Var decs
-let intext_en = "";
-let intext_fr = "";
-let maxLength = 750;
+var intext_en = "";
+var intext_fr = "";
+var maxLength = 750;
 
 //Get elements
-let selectBTN = d3.select("#submitBTN");
-let clearBTN = d3.select("#clearBTN");
-let out_en = d3.select("#output_en");
-let out_fr = d3.select("#output_fr");
-let in_en = d3.select("#input_en");
-let in_fr = d3.select("#input_fr");
-let charsEN = d3.select("#charsEN");
-let charsFR = d3.select("#charsFR");
+var selectBTN = d3.select("#submitBTN");
+var clearBTN = d3.select("#clearBTN");
+var out_en = d3.select("#output_en");
+var out_fr = d3.select("#output_fr");
+var in_en = d3.select("#input_en");
+var in_fr = d3.select("#input_fr");
+var charsEN = d3.select("#charsEN");
+var charsFR = d3.select("#charsFR");
 
 //remaining characters text
 in_en.on("keyup", function() {
-    let tLength = in_en.property("value").length;
+    var tLength = in_en.property("value").length;
     charsEN.text(tLength + "/" + maxLength);
 });
 in_fr.on("keyup", function() {
-    let tLength = in_fr.property("value").length;
+    var tLength = in_fr.property("value").length;
     charsFR.text(tLength + "/" + maxLength);
 });
 
@@ -66,11 +66,11 @@ function newLines() {
     intext_fr=intext_fr.replace(/[¿]/g,"'");
 
     //Regex to find new line or sentences
-    let regex = /[\n\r]|\. |\?|!/g;
+    var regex = /[\n\r]|\. |\?|!/g;
 
     //Split text... no loops or arrays. Isn't javascript wonderful?
-    let text_lines_en = intext_en.split(regex);
-    let text_lines_fr = intext_fr.split(regex);
+    var text_lines_en = intext_en.split(regex);
+    var text_lines_fr = intext_fr.split(regex);
 
     //Quick cleaning text
     text_lines_en = elementClean(text_lines_en);
@@ -81,7 +81,7 @@ function newLines() {
         alert("Text does not match. One language has more sentences/qualifications than the other.")
     }
     else {
-        let alertClass = (["alert alert-success","alert alert-warning","alert alert-danger"]);
+        var alertClass = (["alert alert-success","alert alert-warning","alert alert-danger"]);
 
         //Add eng
         out_en.selectAll("div")
@@ -143,9 +143,9 @@ function newLines() {
 function elementClean (array)
 {
     //Removes non-alphanumeric from beginning of lines
-    let regex = /^[^a-zA-ZéÉàÀ0-9]*/g;
+    var regex = /^[^a-zA-ZéÉàÀ0-9]*/g;
 
-    for (let i in array)
+    for (var i in array)
     {
         array[i]=array[i].replace(regex,'');
         array[i]=array[i].trim();
