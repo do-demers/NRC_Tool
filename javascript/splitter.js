@@ -3,8 +3,6 @@ var intext_en = "";
 var intext_fr = "";
 var maxLength = 750;
 
-//TEST COMMENT FOR COMMIT
-
 //Get elements
 var selectBTN = d3.select("#submitBTN");
 var clearBTN = d3.select("#clearBTN");
@@ -16,38 +14,37 @@ var charsEN = d3.select("#charsEN");
 var charsFR = d3.select("#charsFR");
 
 //remaining characters text
-in_en.on("keyup", function() {
+in_en.on("keyup", function () {
     var tLength = in_en.property("value").length;
     charsEN.text(tLength + "/" + maxLength);
 });
-in_fr.on("keyup", function() {
+in_fr.on("keyup", function () {
     var tLength = in_fr.property("value").length;
     charsFR.text(tLength + "/" + maxLength);
 });
 
 //Perform split/check
-selectBTN.on("click", function() {
-        intext_en = in_en.property("value");
-        intext_en = intext_en.trim();
+selectBTN.on("click", function () {
+    intext_en = in_en.property("value");
+    intext_en = intext_en.trim();
 
-        intext_fr = in_fr.property("value");
-        intext_fr = intext_fr.trim();
+    intext_fr = in_fr.property("value");
+    intext_fr = intext_fr.trim();
 
-        if (intext_en.length === 0 || intext_fr.length === 0)
-        {
-            alert("Please enter text in both input boxes");
-        }
-        else
-        {
-            //Clear any previous results then continue
-            out_en.selectAll("div").remove();
-            out_fr.selectAll("div").remove();
-            newLines();
-        }
+    if (intext_en.length === 0 || intext_fr.length === 0) {
+        alert("Please enter text in both input boxes");
+
+    }
+    else {
+        //Clear any previous results then continue
+        out_en.selectAll("div").remove();
+        out_fr.selectAll("div").remove();
+        newLines();
+    }
 });
 
 //Clear boxes and remove validated lines
-clearBTN.on("click", function (){
+clearBTN.on("click", function () {
     //d3 does not play well with setting textarea value...
     document.getElementById('input_en').value = "";
     document.getElementById('input_fr').value = "";
@@ -62,10 +59,10 @@ clearBTN.on("click", function (){
 //Find line returns, periods with spaces (differs from loops and conditions in SAS code)
 function newLines() {
     //Fix specific characters that can cause problems splitting lines later (hence not in cleaner function)
-    intext_en=intext_en.replace(/[*\t]/g,'');
-    intext_en=intext_en.replace(/[¿]/g,"'");
-    intext_fr=intext_fr.replace(/[*\t]/g,'');
-    intext_fr=intext_fr.replace(/[¿]/g,"'");
+    intext_en = intext_en.replace(/[*\t]/g, '');
+    intext_en = intext_en.replace(/[¿]/g, "'");
+    intext_fr = intext_fr.replace(/[*\t]/g, '');
+    intext_fr = intext_fr.replace(/[¿]/g, "'");
 
     //Regex to find new line or sentences
     var regex = /[\n\r]|\. |\?|!/g;
@@ -83,77 +80,21 @@ function newLines() {
         alert("Text does not match. One language has more sentences/qualifications than the other.")
     }
     else {
-        var alertClass = (["alert alert-success","alert alert-warning","alert alert-danger"]);
-
-        //Add eng
-        out_en.selectAll("div")
-            .data(text_lines_en)
-            .enter().append("div")
-            .attr("class", function (d,i){
-                //just loops through alert styles... to be replaced.
-                if (i>2)
-                {
-                    i = Math.floor(i/3)-1;
-                    return alertClass[i];
-                }
-                else
-                    return alertClass[i];
-            })
-            .style("opacity", "0")
-            .style("height","84px")
-            .style("padding","5px")
-            .style("overflow-y", "auto")
-            .text(function (d) {
-                return d
-            });
-
-        //Add fre
-        out_fr.selectAll("div")
-            .data(text_lines_fr)
-            .enter().append("div")
-            .attr("class", function (d,i){
-                //just loops through alert styles... to be replaced.
-                if (i>2)
-                {
-                    i = Math.floor(i/3)-1;
-                    return alertClass[i];
-                }
-                else
-                    return alertClass[i];
-            })
-            .style("opacity", "0")
-            .style("height","84px")
-            .style("padding","5px")
-            .style("overflow-y", "auto")
-            .text(function (d) {
-                return d
-            });
-
-        out_en.selectAll("div")
-            .transition()
-            .delay(500)
-            .style("opacity", "1");
-
-        out_fr.selectAll("div")
-            .transition()
-            .delay(500)
-            .style("opacity", "1");
+        //Display results
+        results(text_lines_en, text_lines_fr);
     }
 }
 
 //Removes bullets, leading and trailing spaces, blanks, and enumeration lines
-function elementClean (array)
-{
+function elementClean(array) {
     //Removes non-alphanumeric from beginning of lines
     var regex = /^[^a-zA-ZéÉàÀ0-9]*/g;
 
-    for (var i in array)
-    {
-        array[i]=array[i].replace(regex,'');
-        array[i]=array[i].trim();
+    for (var i in array) {
+        array[i] = array[i].replace(regex, '');
+        array[i] = array[i].trim();
 
-       if (array[i].length <=2)
-        {
+        if (array[i].length <= 2) {
             delete array[i];
         }
     }
@@ -162,4 +103,80 @@ function elementClean (array)
     array = array.filter(Boolean);
 
     return array;
+}
+
+function results(text_en, text_fr) {
+
+    var alertClass = (["alert alert-success", "alert alert-warning", "alert alert-danger"]);
+
+    //Algorithm call would go here
+    var length = text_en.length;
+    var pairs = [];
+
+    for (var i =0; i<length;i++)
+    {
+        //must initiate first, otherwise get error
+        pairs[i]={};
+        pairs[i].en = text_en[i];
+        pairs[i].fr = text_fr[i];
+        pairs[i].score = Math.random();
+    }
+
+    //Add eng
+    out_en.selectAll("div")
+        .data(pairs)
+        .enter().append("div")
+        .attr("class", function (d) {
+            if (d.score >= 0.5) {
+                //Good score
+                return alertClass[0];
+            }
+            else if (d.score < 0.3) {
+                //bad score
+                return alertClass[2];
+            }
+            else
+                return alertClass[1];
+        })
+        .style("opacity", "0")
+        .style("height", "84px")
+        .style("padding", "5px")
+        .style("overflow-y", "auto")
+        .text(function (d) {
+            return d.en;
+        });
+
+    //Add fre
+    out_fr.selectAll("div")
+        .data(pairs)
+        .enter().append("div")
+        .attr("class", function (d) {
+            if (d.score >= 0.5) {
+                //Good score
+                return alertClass[0];
+            }
+            else if (d.score < 0.3) {
+                //bad score
+                return alertClass[2];
+            }
+            else
+                return alertClass[1];
+        })
+        .style("opacity", "0")
+        .style("height", "84px")
+        .style("padding", "5px")
+        .style("overflow-y", "auto")
+        .text(function (d) {
+            return d.fr;
+        });
+
+    out_en.selectAll("div")
+        .transition()
+        .delay(500)
+        .style("opacity", "1");
+
+    out_fr.selectAll("div")
+        .transition()
+        .delay(500)
+        .style("opacity", "1");
 }
