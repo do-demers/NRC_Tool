@@ -113,10 +113,9 @@ function results(text_en, text_fr) {
     var length = text_en.length;
     var pairs = [];
 
-    for (var i =0; i<length;i++)
-    {
+    for (var i = 0; i < length; i++) {
         //must initiate first, otherwise get error
-        pairs[i]={};
+        pairs[i] = {};
         pairs[i].en = text_en[i];
         pairs[i].fr = text_fr[i];
         pairs[i].score = Math.random();
@@ -128,7 +127,7 @@ function results(text_en, text_fr) {
         .enter().append("div")
         .attr("class", function (d) {
             if (d.score >= 0.5) {
-                //Good score
+                //good score
                 return alertClass[0];
             }
             else if (d.score < 0.3) {
@@ -142,9 +141,11 @@ function results(text_en, text_fr) {
         .style("height", "84px")
         .style("padding", "5px")
         .style("overflow-y", "auto")
+        .append("p")
         .text(function (d) {
             return d.en;
         });
+
 
     //Add fre
     out_fr.selectAll("div")
@@ -166,9 +167,11 @@ function results(text_en, text_fr) {
         .style("height", "84px")
         .style("padding", "5px")
         .style("overflow-y", "auto")
+        .append("p")
         .text(function (d) {
             return d.fr;
         });
+
 
     out_en.selectAll("div")
         .transition()
