@@ -88,10 +88,13 @@ function newLines() {
 //Removes bullets, leading and trailing spaces, blanks, and enumeration lines
 function elementClean(array) {
     //Removes non-alphanumeric from beginning of lines
-    var regex = /^[^a-zA-ZéÉàÀ0-9]*/g;
+    var regex = /^\w{0,4}[^a-zA-ZéÉàÀ0-9«»]|^\d{0,4}[^a-zA-ZéÉàÀ0-9«»]|^[^a-zA-ZéÉàÀ0-9«»]*/g;
+    var nalpha = /^[^a-zA-ZéÉàÀ0-9«»]*/g;
 
     for (var i in array) {
+        array[i] = array[i].replace(nalpha, '');
         array[i] = array[i].replace(regex, '');
+        array[i] = array[i].replace(nalpha, '');
         array[i] = array[i].trim();
 
         if (array[i].length <= 2) {
@@ -126,14 +129,15 @@ function results(text_en, text_fr) {
         .data(pairs)
         .enter().append("div")
         .attr("class", function (d) {
+            //good score
             if (d.score >= 0.5) {
-                //good score
                 return alertClass[0];
             }
+            //bad score
             else if (d.score < 0.3) {
-                //bad score
                 return alertClass[2];
             }
+            //marginal score
             else
                 return alertClass[1];
         })
@@ -152,14 +156,15 @@ function results(text_en, text_fr) {
         .data(pairs)
         .enter().append("div")
         .attr("class", function (d) {
+            //good score
             if (d.score >= 0.5) {
-                //Good score
                 return alertClass[0];
             }
-            else if (d.score < 0.3) {
-                //bad score
+            //bad score
+            else if (d.score < 0.3){
                 return alertClass[2];
             }
+            //marginal score
             else
                 return alertClass[1];
         })
@@ -171,7 +176,6 @@ function results(text_en, text_fr) {
         .text(function (d) {
             return d.fr;
         });
-
 
     out_en.selectAll("div")
         .transition()
