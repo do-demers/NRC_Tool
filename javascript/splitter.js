@@ -12,6 +12,8 @@ var in_en = d3.select("#input_en");
 var in_fr = d3.select("#input_fr");
 var charsEN = d3.select("#charsEN");
 var charsFR = d3.select("#charsFR");
+var warning = d3.select("#warning");
+var warnText = d3.select("#warnText");
 
 //remaining characters text
 in_en.on("keyup", function () {
@@ -25,6 +27,11 @@ in_fr.on("keyup", function () {
 
 //Perform split/check
 selectBTN.on("click", function () {
+    //"remove" any warnings
+    warning.transition()
+        .delay(250)
+        .style("opacity", "0");
+
     intext_en = in_en.property("value");
     intext_en = intext_en.trim();
 
@@ -32,7 +39,10 @@ selectBTN.on("click", function () {
     intext_fr = intext_fr.trim();
 
     if (intext_en.length === 0 || intext_fr.length === 0) {
-        alert("Please enter text in both input boxes");
+        warning.transition()
+            .delay(250)
+            .style("opacity", "1");
+        warnText.text("Please enter text in both input boxes");
 
     }
     else {
@@ -45,6 +55,11 @@ selectBTN.on("click", function () {
 
 //Clear boxes and remove validated lines
 clearBTN.on("click", function () {
+    //"remove" any warnings
+    warning.transition()
+        .delay(250)
+        .style("opacity", "0");
+
     //d3 does not play well with setting textarea value...
     document.getElementById('input_en').value = "";
     document.getElementById('input_fr').value = "";
@@ -77,7 +92,10 @@ function newLines() {
 
     //Place lines in specific div
     if (text_lines_en.length !== text_lines_fr.length) {
-        alert("Text does not match. One language has more sentences/qualifications than the other.")
+        warning.transition()
+            .delay(250)
+            .style("opacity", "1");
+        warnText.text("Text does not match. One language has more sentences/qualifications than the other.");
     }
     else {
         //Display results
