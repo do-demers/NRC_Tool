@@ -80,7 +80,8 @@ function newLines() {
     intext_fr = intext_fr.replace(/[¿]/g, "'");
 
     //Regex to find new line or sentences
-    var regex = /[\n\r]|\. |\?|!/g;
+    //Algorithm is sensitive to punctuation at end of lines.
+    var regex = /[\n\r](?!\. |\?|!)/g;
 
     //Split text... no loops or arrays. Isn't javascript wonderful?
     var text_lines_en = intext_en.split(regex);
@@ -130,7 +131,12 @@ function results(text_en, text_fr) {
 
     var alertClass = (["alert alert-success", "alert alert-warning", "alert alert-danger"]);
 
-    //Algorithm call would go here
+    //Prepare server request
+    var xhr = new XMLHttpRequest();
+    var url = "http://172.22.23.29/api/teelive_batch";
+    var data;
+
+    //Prepare text
     var length = text_en.length;
     var pairs = [];
 
@@ -139,69 +145,92 @@ function results(text_en, text_fr) {
         pairs[i] = {};
         pairs[i].en = text_en[i];
         pairs[i].fr = text_fr[i];
-        pairs[i].score = Math.random();
+        pairs[i].score = 1;
     }
 
-    //Add eng
-    out_en.selectAll("div")
-        .data(pairs)
-        .enter().append("div")
-        .attr("class", function (d) {
-            //good score
-            if (d.score >= 0.5) {
-                return alertClass[0];
-            }
-            //bad score
-            else if (d.score < 0.3) {
-                return alertClass[2];
-            }
-            //marginal score
-            else
-                return alertClass[1];
-        })
-        .style("opacity", "0")
-        .style("height", "84px")
-        .style("padding", "5px")
-        .style("overflow-y", "auto")
-        .append("p")
-        .text(function (d) {
-            return d.en;
-        });
+    //Send text to algorithm
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
 
+    data = JSON.stringify(pairs);
+    xhr.send(data);
 
-    //Add fre
-    out_fr.selectAll("div")
-        .data(pairs)
-        .enter().append("div")
-        .attr("class", function (d) {
-            //good score
-            if (d.score >= 0.5) {
-                return alertClass[0];
-            }
-            //bad score
-            else if (d.score < 0.3){
-                return alertClass[2];
-            }
-            //marginal score
-            else
-                return alertClass[1];
-        })
-        .style("opacity", "0")
-        .style("height", "84px")
-        .style("padding", "5px")
-        .style("overflow-y", "auto")
-        .append("p")
-        .text(function (d) {
-            return d.fr;
-        });
+    //Handle algorithm response
+    xhr.onreadystatechange = function () {
 
-    out_en.selectAll("div")
-        .transition()
-        .delay(500)
-        .style("opacity", "1");
+        //Good response handler
+        if (xhr.readyState === 4 && xhr.status === 201) {
+            pairs = JSON.parse(xhr.responseText);
 
-    out_fr.selectAll("div")
-        .transition()
-        .delay(500)
-        .style("opacity", "1");
+            console.log(pairs);
+
+            //Add eng
+            out_en.selectAll("div")
+                .data(pairs)
+                .enter().append("div")
+                .attr("class", function (d) {
+                    //good score
+                    if (d.score >= 0.5) {
+                        return alertClass[0];
+                    }
+                    //bad score
+                    else if (d.score < 0.3) {
+                        return alertClass[2];
+                    }
+                    //marginal score
+                    else
+                        return alertClass[1];
+                })
+                .style("opacity", "0")
+                .style("height", "84px")
+                .style("padding", "5px")
+                .style("overflow-y", "auto")
+                .append("p")
+                .text(function (d) {
+                    return d.en;
+                });
+
+            //Add fre
+            out_fr.selectAll("div")
+                .data(pairs)
+                .enter().append("div")
+                .attr("class", function (d) {
+                    //good score
+                    if (d.score >= 0.5) {
+                        return alertClass[0];
+                    }
+                    //bad score
+                    else if (d.score < 0.3) {
+                        return alertClass[2];
+                    }
+                    //marginal score
+                    else
+                        return alertClass[1];
+                })
+                .style("opacity", "0")
+                .style("height", "84px")
+                .style("padding", "5px")
+                .style("overflow-y", "auto")
+                .append("p")
+                .text(function (d) {
+                    return d.fr;
+                });
+
+            out_en.selectAll("div")
+                .transition()
+                .delay(500)
+                .style("opacity", "1");
+
+            out_fr.selectAll("div")
+                .transition()
+                .delay(500)
+                .style("opacity", "1");
+        }
+
+        //Error response handler
+        else if (xhr.status !== 201) {
+            //Handle errors here
+            console.log(JSON.parse(xhr.responseText));
+        }
+    };
 }
