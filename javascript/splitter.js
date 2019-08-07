@@ -172,8 +172,6 @@ function results(text_en, text_fr) {
         if (xhr.readyState === 4 && xhr.status === 201) {
             pairs = JSON.parse(xhr.responseText);
 
-            console.log(pairs);
-
             //Add English results
             out_en.selectAll("div")
                 .data(pairs)
