@@ -15,7 +15,7 @@ var charsFR = d3.select("#charsFR");
 var warning = d3.select("#warning");
 var warnText = d3.select("#warnText");
 
-//remaining characters text
+//Remaining characters text
 in_en.on("keyup", function () {
     var tLength = in_en.property("value").length;
     charsEN.text(tLength + "/" + maxLength);
@@ -32,18 +32,26 @@ selectBTN.on("click", function () {
         .delay(250)
         .style("opacity", "0");
 
+    //Remove leading/trailing whitespace
     intext_en = in_en.property("value");
     intext_en = intext_en.trim();
 
     intext_fr = in_fr.property("value");
     intext_fr = intext_fr.trim();
 
+    //If either input is blank, display error.
     if (intext_en.length === 0 || intext_fr.length === 0) {
         warning.transition()
             .delay(250)
             .style("opacity", "1");
         warnText.text("Please enter text in both input boxes");
-
+    }
+    //If text is the same in the two, alert user
+    else if (intext_en === intext_fr)    {
+        warning.transition()
+            .delay(250)
+            .style("opacity", "1");
+        warnText.text("English and French text is identical. Please check the input boxes.");
     }
     else {
         //Clear any previous results then continue
@@ -60,10 +68,11 @@ clearBTN.on("click", function () {
         .delay(250)
         .style("opacity", "0");
 
-    //d3 does not play well with setting textarea value...
+    //D3 does not play well with setting textarea value...
     document.getElementById('input_en').value = "";
     document.getElementById('input_fr').value = "";
 
+    //Reset remaining characters text
     charsEN.text(0 + "/" + maxLength);
     charsFR.text(0 + "/" + maxLength);
 
@@ -91,7 +100,7 @@ function newLines() {
     text_lines_en = elementClean(text_lines_en);
     text_lines_fr = elementClean(text_lines_fr);
 
-    //Place lines in specific div
+    //If one language has more lines of text than the other, display error.
     if (text_lines_en.length !== text_lines_fr.length) {
         warning.transition()
             .delay(250)
@@ -110,6 +119,7 @@ function elementClean(array) {
     var regex = /^\w{0,4}[^a-zA-ZéÉàÀ0-9«»]|^\d{0,4}[^a-zA-ZéÉàÀ0-9«»]|^[^a-zA-ZéÉàÀ0-9«»]*/g;
     var nalpha = /^[^a-zA-ZéÉàÀ0-9«»]*/g;
 
+    //Do some checks for enumerated points
     for (var i in array) {
         array[i] = array[i].replace(nalpha, '');
         array[i] = array[i].replace(regex, '');
@@ -121,7 +131,7 @@ function elementClean(array) {
         }
     }
 
-    //remove blank rows
+    //Remove blank rows
     array = array.filter(Boolean);
 
     return array;
@@ -133,7 +143,7 @@ function results(text_en, text_fr) {
 
     //Prepare server request
     var xhr = new XMLHttpRequest();
-    var url = "http://172.22.23.29/api/teelive_batch";
+    var url = "http://167.43.6.69:443/api/teelive_batch";
     var data;
 
     //Prepare text
@@ -141,7 +151,7 @@ function results(text_en, text_fr) {
     var pairs = [];
 
     for (var i = 0; i < length; i++) {
-        //must initiate first, otherwise get error
+        //Must initiate first, otherwise get error
         pairs[i] = {};
         pairs[i].en = text_en[i];
         pairs[i].fr = text_fr[i];
@@ -164,7 +174,7 @@ function results(text_en, text_fr) {
 
             console.log(pairs);
 
-            //Add eng
+            //Add English results
             out_en.selectAll("div")
                 .data(pairs)
                 .enter().append("div")
@@ -190,20 +200,20 @@ function results(text_en, text_fr) {
                     return d.en;
                 });
 
-            //Add fre
+            //Add French results
             out_fr.selectAll("div")
                 .data(pairs)
                 .enter().append("div")
                 .attr("class", function (d) {
-                    //good score
+                    //Good score
                     if (d.score >= 0.5) {
                         return alertClass[0];
                     }
-                    //bad score
+                    //Bad score
                     else if (d.score < 0.3) {
                         return alertClass[2];
                     }
-                    //marginal score
+                    //Marginal score
                     else
                         return alertClass[1];
                 })
