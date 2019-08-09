@@ -116,7 +116,7 @@ function newLines() {
 //Removes bullets, leading and trailing spaces, blanks, and enumeration lines
 function elementClean(array) {
     //Removes non-alphanumeric from beginning of lines
-    var regex = /^\w{0,3}[^a-zA-ZéÉàÀ0-9«»]|^\d{0,3}[^a-zA-ZéÉàÀ0-9«»]|^[^a-zA-ZéÉàÀ0-9«»]*/g;
+    var regex = /^\w{0,3}[^a-zA-ZéÉàÀ0-9«»]|^[^a-zA-ZéÉàÀ0-9«»]*/g;
     var nalpha = /^[^a-zA-ZéÉàÀ0-9«»]*/g;
 
     //Do some checks for enumerated points
