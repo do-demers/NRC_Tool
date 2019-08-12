@@ -6,8 +6,8 @@ var maxLength = "...";
 //Get elements
 var selectBTN = d3.select("#submitBTN");
 var clearBTN = d3.select("#clearBTN");
-var out_en = d3.select("#out_en");
-var out_fr = d3.select("#out_fr");
+var out_en = d3.select("#output_en");
+var out_fr = d3.select("#output_fr");
 var in_en = d3.select("#input_en");
 var in_fr = d3.select("#input_fr");
 var charsEN = d3.select("#charsEN");
@@ -15,8 +15,8 @@ var charsFR = d3.select("#charsFR");
 var warning = d3.select("#warning");
 var warnText = d3.select("#warnText");
 
-var out_id = d3.select("#out_id");
-var out_sc = d3.select("#out_sc");
+var out_id = d3.select("#output_id");
+var out_sc = d3.select("#output_sc");
 
 //Remaining characters text
 in_en.on("keyup", function () {
