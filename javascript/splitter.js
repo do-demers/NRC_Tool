@@ -1,19 +1,22 @@
 //Var decs
 var intext_en = "";
 var intext_fr = "";
-var maxLength = 750;
+var maxLength = "...";
 
 //Get elements
 var selectBTN = d3.select("#submitBTN");
 var clearBTN = d3.select("#clearBTN");
-var out_en = d3.select("#output_en");
-var out_fr = d3.select("#output_fr");
+var out_en = d3.select("#out_en");
+var out_fr = d3.select("#out_fr");
 var in_en = d3.select("#input_en");
 var in_fr = d3.select("#input_fr");
 var charsEN = d3.select("#charsEN");
 var charsFR = d3.select("#charsFR");
 var warning = d3.select("#warning");
 var warnText = d3.select("#warnText");
+
+var out_id = d3.select("#out_id");
+var out_sc = d3.select("#out_sc");
 
 //Remaining characters text
 in_en.on("keyup", function () {
@@ -172,6 +175,33 @@ function results(text_en, text_fr) {
         if (xhr.readyState === 4 && xhr.status === 201) {
             pairs = JSON.parse(xhr.responseText);
 
+            //Add ID
+            out_id.selectAll("div")
+                .data(pairs)
+                .enter().append("div")
+                .attr("class", function (d) {
+                    //good score
+                    if (d.score >= 0.5) {
+                        return alertClass[0];
+                    }
+                    //bad score
+                    else if (d.score < 0.3) {
+                        return alertClass[2];
+                    }
+                    //marginal score
+                    else
+                        return alertClass[1];
+                })
+                .style("opacity", "0")
+                .style("height", "84px")
+                .style("width", "100%")
+                .style("padding", "5px")
+                .style("overflow-y", "auto")
+                .append("p")
+                .text(function (d,i) {
+                    return "ID: line " + i;
+                });
+
             //Add English results
             out_en.selectAll("div")
                 .data(pairs)
@@ -191,6 +221,7 @@ function results(text_en, text_fr) {
                 })
                 .style("opacity", "0")
                 .style("height", "84px")
+                .style("width", "100%")
                 .style("padding", "5px")
                 .style("overflow-y", "auto")
                 .append("p")
@@ -217,6 +248,7 @@ function results(text_en, text_fr) {
                 })
                 .style("opacity", "0")
                 .style("height", "84px")
+                .style("width", "100%")
                 .style("padding", "5px")
                 .style("overflow-y", "auto")
                 .append("p")
@@ -224,12 +256,50 @@ function results(text_en, text_fr) {
                     return d.fr;
                 });
 
+            //Add Score
+            out_sc.selectAll("div")
+                .data(pairs)
+                .enter().append("div")
+                .attr("class", function (d) {
+                    //good score
+                    if (d.score >= 0.5) {
+                        return alertClass[0];
+                    }
+                    //bad score
+                    else if (d.score < 0.3) {
+                        return alertClass[2];
+                    }
+                    //marginal score
+                    else
+                        return alertClass[1];
+                })
+                .style("opacity", "0")
+                .style("height", "84px")
+                .style("width", "100%")
+                .style("padding", "5px")
+                .style("overflow-y", "auto")
+                .append("p")
+                .text(function (d) {
+                    return d.score;
+                });
+
+            //transition appearance
+            out_id.selectAll("div")
+                .transition()
+                .delay(500)
+                .style("opacity", "1");
+
             out_en.selectAll("div")
                 .transition()
                 .delay(500)
                 .style("opacity", "1");
 
             out_fr.selectAll("div")
+                .transition()
+                .delay(500)
+                .style("opacity", "1");
+
+            out_sc.selectAll("div")
                 .transition()
                 .delay(500)
                 .style("opacity", "1");

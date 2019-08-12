@@ -37,7 +37,13 @@ span{
     background-color: #243850;
 }
 .output{
-    width: 47.5%;
+    width: 30%;
+    text-align: left;
+    margin: 6px;
+    display: inline-flex;
+}
+.output_test{
+    width: 10%;
     text-align: left;
     margin: 6px;
     display: inline-flex;
@@ -46,7 +52,6 @@ span{
     display: inline;
 }
 .titles{
-
     text-align: center;
 }
 #inputs, #outputs{
