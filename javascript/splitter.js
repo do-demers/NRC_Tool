@@ -6,6 +6,7 @@ var maxLength = "...";
 //Get elements
 var selectBTN = d3.select("#submitBTN");
 var clearBTN = d3.select("#clearBTN");
+var expBTN = d3.select("#csvBTN");
 var out_en = d3.select("#output_en");
 var out_fr = d3.select("#output_fr");
 var in_en = d3.select("#input_en");
@@ -50,7 +51,7 @@ selectBTN.on("click", function () {
         warnText.text("Please enter text in both input boxes");
     }
     //If text is the same in the two, alert user
-    else if (intext_en === intext_fr)    {
+    else if (intext_en === intext_fr) {
         warning.transition()
             .delay(250)
             .style("opacity", "1");
@@ -163,7 +164,7 @@ function results(text_en, text_fr) {
 
     //Send text to algorithm
     xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 
     data = JSON.stringify(pairs);
     xhr.send(data);
@@ -198,8 +199,9 @@ function results(text_en, text_fr) {
                 .style("padding", "5px")
                 .style("overflow-y", "auto")
                 .append("p")
-                .text(function (d,i) {
-                    return "ID: line " + i;
+                .text(function (d, i) {
+                    d.id = i;
+                    return "ID: line " + d.id;
                 });
 
             //Add English results
@@ -308,7 +310,31 @@ function results(text_en, text_fr) {
         //Error response handler
         else if (xhr.status !== 201) {
             //Handle errors here
-            console.log(JSON.parse(xhr.responseText));
+            console.log(JSON.parse(JSON.stringify(xhr.responseText)));
         }
     };
+
+    //Place CSV export here so it has easy access to results
+    expBTN.on("click", function () {
+        console.log(pairs);
+
+        var csv = 'Line ID,English,French,Score\n';
+        pairs.forEach(function (row) {
+            csv += row.id + ',\"' + row.en + '\",\"' + row.fr + '\",' + row.score + '\n';
+        });
+
+        console.log(csv);
+
+        //Need to add BOM since Excel will default to the wrong encoding when opening CSV.
+        //Use of BOM is not otherwise recommended.
+        var universalBOM = "\uFEFF";
+
+        //Download CSV file
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(universalBOM + csv);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'results.csv';
+        hiddenElement.click();
+    });
+
 }
