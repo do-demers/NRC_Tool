@@ -334,7 +334,12 @@ function results(text_en, text_fr) {
         hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(universalBOM + csv);
         hiddenElement.target = '_blank';
         hiddenElement.download = 'results.csv';
+
+        //For browser compatibility
+        document.body.appendChild(hiddenElement);
         hiddenElement.click();
+        document.body.removeChild(hiddenElement);
+
     });
 
 }
