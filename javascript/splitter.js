@@ -61,6 +61,10 @@ selectBTN.on("click", function () {
         //Clear any previous results then continue
         out_en.selectAll("div").remove();
         out_fr.selectAll("div").remove();
+
+        out_id.selectAll("div").remove();
+        out_sc.selectAll("div").remove();
+
         newLines();
     }
 });
@@ -82,6 +86,9 @@ clearBTN.on("click", function () {
 
     out_en.selectAll("div").remove();
     out_fr.selectAll("div").remove();
+
+    out_id.selectAll("div").remove();
+    out_sc.selectAll("div").remove();
 });
 
 //Find line returns, periods with spaces (differs from loops and conditions in SAS code)
@@ -120,7 +127,7 @@ function newLines() {
 //Removes bullets, leading and trailing spaces, blanks, and enumeration lines
 function elementClean(array) {
     //Removes non-alphanumeric from beginning of lines
-    var regex = /^\w{0,3}[^a-zA-ZéÉàÀ0-9«»]|^[^a-zA-ZéÉàÀ0-9«»]*/g;
+    var regex = /^\w{0,4}[^a-zA-ZéÉàÀ0-9«»\s]|^[^a-zA-ZéÉàÀ0-9«»\s]*/g;
     var nalpha = /^[^a-zA-ZéÉàÀ0-9«»]*/g;
 
     //Do some checks for enumerated points
