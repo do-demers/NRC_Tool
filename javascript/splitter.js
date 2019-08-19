@@ -6,8 +6,9 @@ var maxLength = "...";
 //Get elements
 var selectBTN = d3.select("#submitBTN");
 var clearBTN = d3.select("#clearBTN");
-var out_en = d3.select("#out_en");
-var out_fr = d3.select("#out_fr");
+var expBTN = d3.select("#csvBTN");
+var out_en = d3.select("#output_en");
+var out_fr = d3.select("#output_fr");
 var in_en = d3.select("#input_en");
 var in_fr = d3.select("#input_fr");
 var charsEN = d3.select("#charsEN");
@@ -15,8 +16,8 @@ var charsFR = d3.select("#charsFR");
 var warning = d3.select("#warning");
 var warnText = d3.select("#warnText");
 
-var out_id = d3.select("#out_id");
-var out_sc = d3.select("#out_sc");
+var out_id = d3.select("#output_id");
+var out_sc = d3.select("#output_sc");
 
 //Remaining characters text
 in_en.on("keyup", function () {
@@ -50,7 +51,7 @@ selectBTN.on("click", function () {
         warnText.text("Please enter text in both input boxes");
     }
     //If text is the same in the two, alert user
-    else if (intext_en === intext_fr)    {
+    else if (intext_en === intext_fr) {
         warning.transition()
             .delay(250)
             .style("opacity", "1");
@@ -60,6 +61,10 @@ selectBTN.on("click", function () {
         //Clear any previous results then continue
         out_en.selectAll("div").remove();
         out_fr.selectAll("div").remove();
+
+        out_id.selectAll("div").remove();
+        out_sc.selectAll("div").remove();
+
         newLines();
     }
 });
@@ -81,6 +86,9 @@ clearBTN.on("click", function () {
 
     out_en.selectAll("div").remove();
     out_fr.selectAll("div").remove();
+
+    out_id.selectAll("div").remove();
+    out_sc.selectAll("div").remove();
 });
 
 //Find line returns, periods with spaces (differs from loops and conditions in SAS code)
@@ -119,7 +127,7 @@ function newLines() {
 //Removes bullets, leading and trailing spaces, blanks, and enumeration lines
 function elementClean(array) {
     //Removes non-alphanumeric from beginning of lines
-    var regex = /^\w{0,3}[^a-zA-ZéÉàÀ0-9«»]|^[^a-zA-ZéÉàÀ0-9«»]*/g;
+    var regex = /^\w{0,4}[^a-zA-ZéÉàÀ0-9«»\s]|^[^a-zA-ZéÉàÀ0-9«»\s]*/g;
     var nalpha = /^[^a-zA-ZéÉàÀ0-9«»]*/g;
 
     //Do some checks for enumerated points
@@ -163,7 +171,7 @@ function results(text_en, text_fr) {
 
     //Send text to algorithm
     xhr.open("POST", url, true);
-    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
 
     data = JSON.stringify(pairs);
     xhr.send(data);
@@ -198,8 +206,9 @@ function results(text_en, text_fr) {
                 .style("padding", "5px")
                 .style("overflow-y", "auto")
                 .append("p")
-                .text(function (d,i) {
-                    return "ID: line " + i;
+                .text(function (d, i) {
+                    d.id = i;
+                    return "ID: line " + d.id;
                 });
 
             //Add English results
@@ -308,7 +317,36 @@ function results(text_en, text_fr) {
         //Error response handler
         else if (xhr.status !== 201) {
             //Handle errors here
-            console.log(JSON.parse(xhr.responseText));
+            console.log(JSON.parse(JSON.stringify(xhr.responseText)));
         }
     };
+
+    //Place CSV export here so it has easy access to results
+    expBTN.on("click", function () {
+        console.log(pairs);
+
+        var csv = 'Line ID,English,French,Score\n';
+        pairs.forEach(function (row) {
+            csv += row.id + ',\"' + row.en + '\",\"' + row.fr + '\",' + row.score + '\n';
+        });
+
+        console.log(csv);
+
+        //Need to add BOM since Excel will default to the wrong encoding when opening CSV.
+        //Use of BOM is not otherwise recommended.
+        var universalBOM = "\uFEFF";
+
+        //Download CSV file
+        var hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(universalBOM + csv);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'results.csv';
+
+        //For browser compatibility
+        document.body.appendChild(hiddenElement);
+        hiddenElement.click();
+        document.body.removeChild(hiddenElement);
+
+    });
+
 }
