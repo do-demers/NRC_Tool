@@ -94,9 +94,9 @@ clearBTN.on("click", function () {
 //Find line returns, periods with spaces (differs from loops and conditions in SAS code)
 function newLines() {
     //Fix specific characters that can cause problems splitting lines later (hence not in cleaner function)
-    intext_en = intext_en.replace(/[*\t]/g, '');
+    intext_en = intext_en.replace(/[*\t]/g, ' ');
     intext_en = intext_en.replace(/[¿]/g, "'");
-    intext_fr = intext_fr.replace(/[*\t]/g, '');
+    intext_fr = intext_fr.replace(/[*\t]/g, ' ');
     intext_fr = intext_fr.replace(/[¿]/g, "'");
 
     //Regex to find new line or sentences
