@@ -15,8 +15,10 @@ EXPOSE 8080
 # Write the PID file to a location where regular users have write access.
 RUN sed --regexp-extended --in-place=.bak 's%^pid\s+/var/run/nginx.pid;%pid /var/tmp/nginx.pid;%' /etc/nginx/nginx.conf
 
-COPY ./nginx/nginx-server.conf /etc/nginx/conf.d/default.conf
 # Copy the nginx configuration
-# COPY --from=build-stage /app/build/ /usr/share/nginx/html
+#COPY ./nginx/nginx-server.conf /etc/nginx/conf.d/default.conf
+
+# Copy NRC frontend files
+COPY  ./NRC_Tool /usr/share/nginx/html
 
 USER nginx
