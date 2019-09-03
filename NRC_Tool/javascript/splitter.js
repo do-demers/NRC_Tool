@@ -154,7 +154,7 @@ function results(text_en, text_fr) {
 
     //Prepare server request
     var xhr = new XMLHttpRequest();
-    var url = "http://167.43.6.69:443/api/teelive_batch";
+    var url = "http://teelive-backend/api/teelive_batch";
     var data;
 
     //Prepare text
