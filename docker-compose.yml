@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  teelive-frontend:
+    image : pscgcdev.azurecr.io/teelive_frontend
+    restart: unless-stopped
+    ports:
+      - 80:8080
+    depends_on:
+      - teelive-backend
+
+  teelive-backend:
+    image: pscgcdev.azurecr.io/teelive_backend
+    restart: unless-stopped
+    
