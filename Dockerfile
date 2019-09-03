@@ -16,7 +16,7 @@ EXPOSE 8080
 RUN sed --regexp-extended --in-place=.bak 's%^pid\s+/var/run/nginx.pid;%pid /var/tmp/nginx.pid;%' /etc/nginx/nginx.conf
 
 # Copy the nginx configuration
-#COPY ./nginx/nginx-server.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx/nginx-proxy.conf /etc/nginx/conf.d/default.conf
 
 # Copy NRC frontend files
 COPY  ./NRC_Tool /usr/share/nginx/html
