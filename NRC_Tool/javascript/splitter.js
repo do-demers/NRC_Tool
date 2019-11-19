@@ -100,8 +100,7 @@ function newLines() {
     intext_fr = intext_fr.replace(/[¿]/g, "'");
 
     //Regex to find new line or sentences
-    //Algorithm is sensitive to punctuation at end of lines.
-    var regex = /[\n\r](?!\. |\?|!)/g;
+    var regex = /[\n\r]|\. |\?|!/g;
 
     //Split text... no loops or arrays. Isn't javascript wonderful?
     var text_lines_en = intext_en.split(regex);
@@ -127,8 +126,8 @@ function newLines() {
 //Removes bullets, leading and trailing spaces, blanks, and enumeration lines
 function elementClean(array) {
     //Removes non-alphanumeric from beginning of lines
-    var regex = /^\w{0,4}[^a-zA-ZéÉàÀ0-9«»\s]|^[^a-zA-ZéÉàÀ0-9«»\s]*/g;
-    var nalpha = /^[^a-zA-ZéÉàÀ0-9«»]*/g;
+    var regex = /^\w{0,4}[^a-zàâçéèêëîïôûùüÿñæœ0-9«»\s]|^[^a-za-zàâçéèêëîïôûùüÿñæœ0-9«»\s]*/gi;
+    var nalpha = /^[^a-zàâçéèêëîïôûùüÿñæœ0-9«»]*/gi;
 
     //Do some checks for enumerated points
     for (var i in array) {
@@ -150,11 +149,11 @@ function elementClean(array) {
 
 function results(text_en, text_fr) {
 
-    var alertClass = (["alert alert-success", "alert alert-warning", "alert alert-danger"]);
+    var alertClass = (["alert alert-success", "alert alert-warning", "alert alert-danger", "alert alert-info"]);
 
     //Prepare server request
     var xhr = new XMLHttpRequest();
-    var url = "http://167.43.6.84/api/teelive_batch";
+    var url = "http://167.43.6.84:443/api/teelive_batch";
     var data;
 
     //Prepare text
@@ -166,9 +165,201 @@ function results(text_en, text_fr) {
         pairs[i] = {};
         pairs[i].en = text_en[i];
         pairs[i].fr = text_fr[i];
-        pairs[i].score = 1;
+        pairs[i].score =  1;
     }
 
+    for (var j = 0; j < length; j++) {
+        if (j === 0)
+        {
+            pairs[j].score = 0;
+        }
+        else
+            pairs[j].score = Math.random();
+    }
+
+    //Add ID
+    /*out_id.selectAll("div")
+        .data(pairs)
+        .enter().append("div")
+        .attr("class", function (d) {
+            //and/or error
+            if (d.score === 0) {
+                return alertClass[3];
+            }
+            //good score
+            else if (d.score >= 0.6) {
+                return alertClass[0];
+            }
+            //bad score
+            else if (d.score < 0.4) {
+                return alertClass[2];
+            }
+            //marginal score
+            else
+                return alertClass[1];
+        })
+        .style("opacity", "0")
+        .style("height", "84px")
+        .style("width", "100%")
+        .style("padding", "5px")
+        .style("overflow-y", "auto")
+        .append("p")
+        .text(function (d, i) {
+            d.id = i;
+            return "ID: line " + d.id;
+        });*/
+
+    //Add English results
+    out_en.selectAll("div")
+        .data(pairs)
+        .enter().append("div")
+        .attr("class", function (d) {
+            //and/or error
+            if (d.score === 0) {
+                return alertClass[3] + " msgEN";
+            }
+            //good score
+            else if (d.score >= 0.6) {
+                return alertClass[0] + " msgEN";
+            }
+            //bad score
+            else if (d.score < 0.4) {
+                return alertClass[2] + " msgEN";
+            }
+            //marginal score
+            else
+                return alertClass[1] + " msgEN";
+        })
+        .style("opacity", "0")
+        .style("height", "100px")
+        .style("width", "100%")
+        .style("padding", "5px")
+        .style("overflow-y", "auto")
+        .append("p")
+        .text(function (d) {
+            return d.en;
+        });
+
+    //Add French results
+    out_fr.selectAll("div")
+        .data(pairs)
+        .enter().append("div")
+        .attr("class", function (d) {
+            //and/or error
+            if (d.score === 0) {
+                return alertClass[3] + " msgFR";
+            }
+            //good score
+            else if (d.score >= 0.6) {
+                return alertClass[0] + " msgFR";
+            }
+            //Bad score
+            else if (d.score < 0.4) {
+                return alertClass[2] + " msgFR";
+            }
+            //Marginal score
+            else
+                return alertClass[1] + " msgFR";
+        })
+        .style("opacity", "0")
+        .style("height", "100px")
+        .style("width", "100%")
+        .style("padding", "5px")
+        .style("overflow-y", "auto")
+        .append("p")
+        .text(function (d) {
+            return d.fr;
+        });
+
+    //Add message box to each result box
+    d3.selectAll(".alert-success.msgEN")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("Ok")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    d3.selectAll(".alert-success.msgFR")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("Ok")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    d3.selectAll(".alert-info.msgEN")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("Please check your 'and/or'")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    d3.selectAll(".alert-info.msgFR")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("Veuillez vérifier votre et / ou")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    d3.selectAll(".alert-warning.msgEN")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("The text may not be equivalent")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    d3.selectAll(".alert-warning.msgFR")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("Le texte peut ne pas être équivalent")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    d3.selectAll(".alert-danger.msgEN")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("The text is not equivalent")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    d3.selectAll(".alert-danger.msgFR")
+        .append("div")
+        .attr("class","msgbox")
+        .append("p")
+        .text("Le texte n'est pas équivalent")
+        .style("padding", "0")
+        .style("margin", "0");
+
+    //transition appearance
+    out_id.selectAll("div")
+        .transition()
+        .delay(500)
+        .style("opacity", "1");
+
+    out_en.selectAll("div")
+        .transition()
+        .delay(500)
+        .style("opacity", "1");
+
+    out_fr.selectAll("div")
+        .transition()
+        .delay(500)
+        .style("opacity", "1");
+
+    out_sc.selectAll("div")
+        .transition()
+        .delay(500)
+        .style("opacity", "1");
+
+
+    //Good code for actual results
+    /*
     //Send text to algorithm
     xhr.open("POST", url, true);
     xhr.setRequestHeader("Content-Type", "application/json; charset=utf-8");
@@ -183,17 +374,22 @@ function results(text_en, text_fr) {
         if (xhr.readyState === 4 && xhr.status === 201) {
             pairs = JSON.parse(xhr.responseText);
 
+/*This section must change based on edits above
             //Add ID
             out_id.selectAll("div")
                 .data(pairs)
                 .enter().append("div")
                 .attr("class", function (d) {
+                    //and/or error
+                    if (d.score = 0) {
+                        return alertClass[3];
+                    }
                     //good score
-                    if (d.score >= 0.5) {
+                    else if (d.score >= 0.6) {
                         return alertClass[0];
                     }
                     //bad score
-                    else if (d.score < 0.3) {
+                    else if (d.score < 0.4) {
                         return alertClass[2];
                     }
                     //marginal score
@@ -216,12 +412,16 @@ function results(text_en, text_fr) {
                 .data(pairs)
                 .enter().append("div")
                 .attr("class", function (d) {
+                    //and/or error
+                    if (d.score = 0) {
+                        return alertClass[3];
+                    }
                     //good score
-                    if (d.score >= 0.5) {
+                    else if (d.score >= 0.6) {
                         return alertClass[0];
                     }
                     //bad score
-                    else if (d.score < 0.3) {
+                    else if (d.score < 0.4) {
                         return alertClass[2];
                     }
                     //marginal score
@@ -243,12 +443,16 @@ function results(text_en, text_fr) {
                 .data(pairs)
                 .enter().append("div")
                 .attr("class", function (d) {
-                    //Good score
-                    if (d.score >= 0.5) {
+                    //and/or error
+                    if (d.score = 0) {
+                        return alertClass[3];
+                    }
+                    //good score
+                    else if (d.score >= 0.6) {
                         return alertClass[0];
                     }
                     //Bad score
-                    else if (d.score < 0.3) {
+                    else if (d.score < 0.4) {
                         return alertClass[2];
                     }
                     //Marginal score
@@ -270,12 +474,16 @@ function results(text_en, text_fr) {
                 .data(pairs)
                 .enter().append("div")
                 .attr("class", function (d) {
+                    //and/or error
+                    if (d.score = 0) {
+                        return alertClass[3];
+                    }
                     //good score
-                    if (d.score >= 0.5) {
+                    else if (d.score >= 0.6) {
                         return alertClass[0];
                     }
                     //bad score
-                    else if (d.score < 0.3) {
+                    else if (d.score < 0.4) {
                         return alertClass[2];
                     }
                     //marginal score
@@ -312,16 +520,20 @@ function results(text_en, text_fr) {
                 .transition()
                 .delay(500)
                 .style("opacity", "1");
-        }
+
+
+*/
+/*        }
 
         //Error response handler
         else if (xhr.status !== 201) {
             //Handle errors here
             console.log(JSON.parse(JSON.stringify(xhr.responseText)));
         }
-    };
 
-    //Place CSV export here so it has easy access to results
+    };*/
+
+//Place CSV export here so it has easy access to results
     expBTN.on("click", function () {
         console.log(pairs);
 

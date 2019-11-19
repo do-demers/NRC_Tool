@@ -52,8 +52,15 @@ span{
     display: inline;
 }
 .titles{
-
     text-align: center;
+}
+.msgbox{
+    border: 1px solid lightgray;
+    border-radius: 2px;
+    margin-top: 6px;
+    padding: 5px;
+    text-align: center;
+    font-size: 14px;
 }
 #inputs, #outputs{
     border-top: 1px solid #dddddd;
